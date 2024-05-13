@@ -2,10 +2,10 @@ use crate::{Error, Response};
 
 use std::{io, net::Ipv4Addr};
 
+use async_std::net::UdpSocket;
 use async_stream::try_stream;
 use futures_core::Stream;
 use std::sync::Arc;
-use async_std::net::UdpSocket;
 
 use net2::UdpSocketExt;
 
@@ -32,8 +32,14 @@ pub fn mdns_interface(
     let recv_buffer = vec![0; 4096];
 
     Ok((
-        mDNSListener { recv: socket.clone(), recv_buffer },
-        mDNSSender { service_name, send: socket },
+        mDNSListener {
+            recv: socket.clone(),
+            recv_buffer,
+        },
+        mDNSSender {
+            service_name,
+            send: socket,
+        },
     ))
 }
 
@@ -57,7 +63,7 @@ fn create_socket() -> io::Result<std::net::UdpSocket> {
 /// An mDNS sender on a specific interface.
 #[derive(Debug, Clone)]
 #[allow(non_camel_case_types)]
-pub struct mDNSSender<> {
+pub struct mDNSSender {
     service_name: String,
     send: Arc<UdpSocket>,
 }

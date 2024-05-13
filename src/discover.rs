@@ -105,12 +105,10 @@ impl Discovery {
 
         let stream = select(response_stream, interval_stream);
         stream
-            .filter_map(|stream_result| {
-                async {
-                    match stream_result {
-                        StreamResult::Interval => None,
-                        StreamResult::Response(res) => Some(res),
-                    }
+            .filter_map(|stream_result| async {
+                match stream_result {
+                    StreamResult::Interval => None,
+                    StreamResult::Response(res) => Some(res),
                 }
             })
             .filter(move |res| {
